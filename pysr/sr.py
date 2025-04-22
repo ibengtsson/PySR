@@ -1781,6 +1781,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
         runtime_params: _DynamicallySetParams,
         weights: ndarray | None,
         category: ndarray | None,
+        batch_index: ndarray | None,
         seed: int,
     ):
         """
@@ -2073,6 +2074,14 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
         else:
             jl_extra = jl.NamedTuple()
 
+        if batch_index is not None:
+            offset_for_julia_indexing = 1
+            jl_batch_index = jl_array(
+                (batch_index + offset_for_julia_indexing).astype(np.int64)
+            )
+        else:
+            jl_batch_index = None
+
         if len(y.shape) > 1:
             # We set these manually so that they respect Python's 0 indexing
             # (by default Julia will use y1, y2...)
@@ -2086,6 +2095,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             jl_X,
             jl_y,
             weights=jl_weights,
+            batch_assignments=jl_batch_index,
             extra=jl_extra,
             niterations=int(self.niterations),
             variable_names=jl_array([str(v) for v in self.feature_names_in_]),
@@ -2134,6 +2144,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
         *,
         Xresampled=None,
         weights=None,
+        batch_index=None,
         variable_names: ArrayLike[str] | None = None,
         complexity_of_variables: int | float | list[int | float] | None = None,
         X_units: ArrayLike[str] | None = None,
@@ -2160,6 +2171,8 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             for that particular element of `y`. Alternatively,
             if a custom `loss` was set, it will can be used
             in arbitrary ways.
+        batch_index : ndarray 
+            ...
         variable_names : list[str]
             A list of names for the variables, rather than "x0", "x1", etc.
             If `X` is a pandas dataframe, the column names will be used
@@ -2286,7 +2299,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             self._checkpoint()
 
         # Perform the search:
-        self._run(X, y, runtime_params, weights=weights, seed=seed, category=category)
+        self._run(X, y, runtime_params, weights=weights, batch_index=batch_index, seed=seed, category=category)
 
         # Then, after fit, we save again, so the pickle file contains
         # the equations:
