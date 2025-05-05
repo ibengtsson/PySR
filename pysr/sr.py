@@ -1492,6 +1492,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
         y,
         Xresampled,
         weights,
+        batch_index,
         variable_names,
         complexity_of_variables,
         X_units,
@@ -1499,6 +1500,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
     ) -> tuple[
         ndarray,
         ndarray,
+        ndarray | None,
         ndarray | None,
         ndarray | None,
         ArrayLike[str],
@@ -1599,6 +1601,10 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
         if weights is not None:
             weights = check_array(weights, ensure_2d=False)
             check_consistent_length(weights, y)
+        if batch_index is not None:
+            batch_index = check_array(batch_index, ensure_2d=False)
+            check_consistent_length(batch_index, y)
+
         X, y = self._validate_data_X_y(X, y)
         self.feature_names_in_ = _safe_check_feature_names_in(
             self, variable_names, generate_names=False
@@ -1631,6 +1637,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             y,
             Xresampled,
             weights,
+            batch_index,
             variable_names,
             complexity_of_variables,
             X_units,
@@ -2235,6 +2242,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             y,
             Xresampled,
             weights,
+            batch_index,
             variable_names,
             complexity_of_variables,
             X_units,
@@ -2244,6 +2252,7 @@ class PySRRegressor(MultiOutputMixin, RegressorMixin, BaseEstimator):
             y,
             Xresampled,
             weights,
+            batch_index,
             variable_names,
             complexity_of_variables,
             X_units,
