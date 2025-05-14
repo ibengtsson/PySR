@@ -350,7 +350,7 @@ def parametric_expression_deprecation_warning(
         "Then, add the category as a column in X: `X = np.column_stack([X, category])`, and avoid passing `category` to `fit`.\n"
     )
 
-    warnings.warn(message, FutureWarning, stacklevel=2)
+    warnings.warn(message, FutureWarning, stacklevel=3)
 
 
 class ParametricExpressionSpec(AbstractExpressionSpec):
